@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Rate Me</title>
+
+    <link rel="stylesheet" type="text/css" href="main.css">
+
+    <script src="./node_modules/web3/dist/web3.min.js"></script>
+
+
+</head>
+<body>
+<div class="container">
+
+    <h1>Rate It NOW...!!!</h1>
+
+    <span id="countIns"></span>
+    <h2 id="instructor"></h2>
+    <span id="insTrans"></span>
+    <hr/>
+
+    <img id="loader" src="https://loading.io/spinners/double-ring/lg.double-ring-spinner.gif"/>
+    <!--for inheritance and smart contract, i have changed '#name' to 2fields '#fname','#lname'-->
+    <label for="name" class="col-lg-2 control-label">Name</label>
+    <input id="name" type="text">
+
+    <label for="desc" class="col-lg-2 control-label">Description</label>
+    <input id="desc" type="text">
+
+    <label for="desc" class="col-lg-2 control-label">Age</label>
+    <input id="age" type="text">
+
+    <label for="desc" class="col-lg-2 control-label">Rate</label>
+    <input id="rate" type="text">
+
+    <button id="button">Update</button>
+
+</div>
+
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+
+<script>
+
+    if (typeof web3 !== 'undefined') {
+        web3 = new Web3(web3.currentProvider);
+    } else {
+        // set the provider you want from Web3.providers
+        web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
+    }
+
+    //if i change account from 0 to 4 then i will receive error in browser console "o noo"
+    //if it is 0 then i will not get any error
+    web3.eth.defaultAccount = web3.eth.accounts[0];
+
+    var People = web3.eth.contract([
+        {
+            "anonymous": false,
+            "inputs": [
+                {
+                    "indexed": false,
+                    "name": "age",
+                    "type": "uint256"
+                },
+                {
+                    "indexed": false,
+                    "name": "name",
+                    "type": "bytes16"
+                },
+                {
+                    "indexed": false,
+                    "name": "desc",
+                    "type": "bytes16"
+                },
+                {
+                    "indexed": false,
+                    "name": "rating",
+                    "type": "uint256"
+                }
+            ],
+            "name": "peopleInfo",
+            "type": "event"
+        },
+        {
+            "constant": false,
+            "inputs": [
+                {
+                    "name": "_address",
+                    "type": "address"
+                },
+                {
+                    "name": "_age",
+                    "type": "uint256"
+                },
+                {
+                    "name": "_name",
+                    "type": "bytes16"
+                },
+                {
+                    "name": "_desc",
+                    "type": "bytes16"
+                },
+                {
+                    "name": "_rating",
+                    "type": "uint256"
+                }
+            ],
+            "name": "setPeople",
+            "outputs": [],
+            "payable": false,
+            "stateMutability": "nonpayable",
+            "type": "function"
+        },
+        {
+            "constant": true,
+            "inputs": [],
+            "name": "countPeoples",
+            "outputs": [
+                {
+                    "name": "",
+                    "type": "uint256"
+                }
+            ],
+            "payable": false,
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "constant": true,
+            "inputs": [
+                {
+                    "name": "_address",
+                    "type": "address"
+                }
+            ],
+            "name": "getPeople",
+            "outputs": [
+                {
+                    "name": "",
+                    "type": "uint256"
+                },
+                {
+                    "name": "",
+                    "type": "bytes16"
+                },
+                {
+                    "name": "",
+                    "type": "bytes16"
+                },
+                {
+                    "name": "",
+                    "type": "uint256"
+                }
+            ],
+            "payable": false,
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "constant": true,
+            "inputs": [],
+            "name": "getPeoples",
+            "outputs": [
+                {
+                    "name": "",
+                    "type": "address[]"
+                }
+            ],
+            "payable": false,
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "constant": true,
+            "inputs": [
+                {
+                    "name": "",
+                    "type": "uint256"
+                }
+            ],
+            "name": "peoplesAccts",
+            "outputs": [
+                {
+                    "name": "",
+                    "type": "address"
+                }
+            ],
+            "payable": false,
+            "stateMutability": "view",
+            "type": "function"
+        }
+    ]);
+
+
+    var peeple = People.at('0x3f5264c691005ffa98f74938b6f689051aaa1a6f');
+    console.log(peeple);
+
+
+    //commented bcz it is not user friendly, so we are implementing another logic below...
+    // first_p.getInstructor(function (error, result) {
+    //
+    //     if (!error){
+    //         $("#instructor").html(result[0]+' ('+result[1]+' year old)');
+    //     }else
+    //         console.log(error);
+    // });
+
+
+    //getting instructor
+    //for inheritance and contract i have changed first_p.Instructor() to first_p.instructorInfo({},'latest')
+    var peopleEvent = peeple.peopleInfo({},'latest');
+
+ // //  it is for before inheritance and contract
+    // instructorEvent.watch(function (error,result) {
+    //     if (!error){
+    //         $('#loader').hide();
+    //         $('#instructor').html(result.args.name + '( ' + result.args.age + ' years old)');
+    //     }
+    //     else {
+    //         $('#loader').hide();
+    //         console.log(error);
+    //     }
+    // })
+    //
+    // //setting instructor
+    // $("#button").click(function () {
+    //     $('#loader').show();
+    //     first_p.setInstructor($("#name").val(), $("#age").val(),(err,res) => {
+    //         if (err){
+    //             $('#loader').hide();
+    //             console.log("Oh Nooooo");
+    //         }
+    //     });
+    // });
+
+
+    peopleEvent.watch(function (error,result) {
+        if (!error){
+            if (result.blockHash != $("#insTrans").html())
+                $('#loader').hide();
+            $("#insTrans").html("Block hash : " + result.blockHash);
+            //we use ascii because we change string to byte type in solidity contract
+            $('#instructor').html(web3.toAscii(result.args.name) + ' ' + web3.toAscii(result.args.desc) + '( ' + result.args.age + ' years old)' + '( ' + result.args.rating + ' stars rated)');
+        }
+        else {
+            $('#loader').hide();
+            console.log(error);
+        }
+    })
+
+
+    peeple.countPeoples((err,res) => {
+        if (res)
+            $('#countIns').html(res.c + " peoples");
+    });
+
+
+    //setting instructor
+    $("#button").click(function () {
+        $('#loader').show();
+        peeple.setPeople(web3.eth.defaultAccount, $("#age").val(),$("#name").val(),$("#desc").val(),$("#rate").val(),(err,res) => {
+            if (err){
+                $('#loader').hide();
+                console.log("Oh Nooooo");
+            }
+        });
+    });
+</script>
+
+</body>
+</html>
