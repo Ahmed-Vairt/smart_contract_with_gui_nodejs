@@ -1,0 +1,72 @@
+pragma solidity ^0.4.18;
+
+
+contract owned{
+    
+    address owner;
+    
+    function owned() public {
+        owner = msg.sender;
+    }
+    
+    modifier onlyOwner() {
+        require(msg.sender == owner);
+        _;
+    }
+    
+}
+
+
+contract rate is owned{
+    
+    //struct > //dynamically sized array //contract
+    struct People{
+         uint age;
+        //change string type to bytes16...bcz string string type is costly on ethereum network
+        bytes16 name;
+        bytes16 desc;
+        uint rating;
+    }
+    
+    mapping (address => People) peoples;
+    address[] public peoplesAccts;
+    
+    //when a new instructor added or updated 
+    event peopleInfo(
+        uint age,
+        bytes16 name,
+        bytes16 desc,
+        uint rating
+    );
+        
+    
+     //getting (account address , age ,name, desc,rating)
+    function setPeople(address _address,uint _age,bytes16 _name, bytes16 _desc, uint _rating) onlyOwner public {
+        var people = peoples[_address];
+        
+        people.age = _age;
+        people.name = _name;
+        people.desc = _desc;
+        people.rating = _rating;
+        
+        
+        peoplesAccts.push(_address) -1;
+        peopleInfo(_age, _name, _desc, _rating);
+    }
+    
+    //view all account addressess
+    function getPeoples() view public returns (address[]){
+        return peoplesAccts;
+    }
+    
+    //getting account address and showing its data e.g (age,name,desc,rate)
+    function getPeople(address _address) view public returns(uint, bytes16, bytes16,uint){
+        return (peoples[_address].age,peoples[_address].name,peoples[_address].desc,peoples[_address].rating);
+    }
+    
+    //counting all accounts
+    function countPeoples() view public returns (uint){
+        return peoplesAccts.length;
+    }
+    
+}
